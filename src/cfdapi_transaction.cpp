@@ -324,6 +324,7 @@ TransactionController TransactionApi::FundRawTransaction(
   } else {
     target_amount = Amount::CreateBySatoshiAmount(0);
   }
+  info(CFD_LOG_SOURCE, "1. target_amount=[{}]", target_amount.GetSatoshiValue());
 
   std::vector<uint8_t> txid_bytes(cfd::core::kByteData256Length);
   Amount dest_amount = tx_amount;
@@ -331,6 +332,7 @@ TransactionController TransactionApi::FundRawTransaction(
     // txout設定額よりも大きな額を収集要求した
     dest_amount = target_value;
   }
+  info(CFD_LOG_SOURCE, "2. dest_amount=[{}]", dest_amount.GetSatoshiValue());
 
   // execute coinselection
   CoinApi coin_api;
@@ -338,7 +340,7 @@ TransactionController TransactionApi::FundRawTransaction(
   std::vector<Utxo> utxo_list = coin_api.ConvertToUtxo(utxos);
   Amount utxo_amount = txin_amount;
   std::vector<Utxo> selected_coins;
-  if (target_amount > 0) {
+  if (target_amount > 0 || fee > 0) {
     info(CFD_LOG_SOURCE, "target_amount={}", target_amount.GetSatoshiValue());
     selected_coins = coin_select.SelectCoins(
         target_amount, utxo_list, utxo_filter, option, fee, &utxo_amount,
@@ -350,9 +352,11 @@ TransactionController TransactionApi::FundRawTransaction(
       throw CfdException(CfdError::kCfdIllegalArgumentError, "low BTC.");
     }
   }
+  info(CFD_LOG_SOURCE, "3. utxo_amount=[{}]", utxo_amount.GetSatoshiValue());
 
   Amount diff_amount = utxo_amount;
-  diff_amount -= dest_amount;
+  diff_amount -= tx_amount;
+  info(CFD_LOG_SOURCE, "4. diff_amount=[{}]", diff_amount.GetSatoshiValue());
   int64_t diff_satoshi = diff_amount.GetSatoshiValue();
   Address address = addr_factory.GetAddress(reserve_txout_address);
   Amount dust_amount = option.GetDustFeeAmount(address);
