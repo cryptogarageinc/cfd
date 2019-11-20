@@ -286,6 +286,22 @@ TransactionController TransactionApi::FundRawTransaction(
   if (prefix_list) {
     addr_factory = AddressFactory(net_type, *prefix_list);
   }
+  Address reserve_address = 
+      addr_factory.GetAddress(reserve_txout_address);
+  // FIXME(fujita-cg): AddressFactory::GetAddress()でチェックをしたいが、
+  //   影響範囲が大きいためAPIでチェックを実行
+  if (!addr_factory.CheckAddressNetType(reserve_address, net_type)) {
+    warn(
+        CFD_LOG_SOURCE,
+        "Failed to FundRawTransaction. "
+        "Input address and network is unmatch."
+        ": input_net_type=[{}], parsed_net_type=[{}]",
+        net_type, reserve_address.GetNetType());
+    throw CfdException(
+        CfdError::kCfdIllegalArgumentError, 
+        "Failed to FundRawTransaction. "
+        "Input address and network is unmatch.");
+  }
 
   // txから設定済みTxIn/TxOutの額を収集
   // (selected_txin_utxos指定分はtxid一致なら設定済みUTXO扱い)
@@ -296,12 +312,15 @@ TransactionController TransactionApi::FundRawTransaction(
   for (const auto& txout : tx.GetTxOutList()) {
     tx_amount += txout.GetValue();
   }
+  std::vector<UtxoData> matched_txin_utxos;
+  matched_txin_utxos.reserve(selected_txin_utxos.size());
   const auto& txin_list = tx.GetTxInList();
   for (const auto& utxo : selected_txin_utxos) {
     for (const auto& txin : txin_list) {
       if ((txin.GetTxid().Equals(utxo.txid)) &&
           (utxo.vout == txin.GetVout())) {
         txin_amount += utxo.amount;
+        matched_txin_utxos.push_back(utxo);
         break;
       }
     }
@@ -310,7 +329,7 @@ TransactionController TransactionApi::FundRawTransaction(
   Amount fee;
   if (option.GetEffectiveFeeBaserate() != 0) {
     fee = EstimateFee(
-        tx_hex, selected_txin_utxos, nullptr, nullptr, effective_fee_rate);
+        tx_hex, matched_txin_utxos, nullptr, nullptr, effective_fee_rate);
     info(CFD_LOG_SOURCE, "fee={}", fee.GetSatoshiValue());
   }
 
@@ -324,15 +343,12 @@ TransactionController TransactionApi::FundRawTransaction(
   } else {
     target_amount = Amount::CreateBySatoshiAmount(0);
   }
-  info(CFD_LOG_SOURCE, "1. target_amount=[{}]", target_amount.GetSatoshiValue());
 
-  std::vector<uint8_t> txid_bytes(cfd::core::kByteData256Length);
   Amount dest_amount = tx_amount;
   if (target_value > dest_amount) {
     // txout設定額よりも大きな額を収集要求した
     dest_amount = target_value;
   }
-  info(CFD_LOG_SOURCE, "2. dest_amount=[{}]", dest_amount.GetSatoshiValue());
 
   // execute coinselection
   CoinApi coin_api;
@@ -352,11 +368,10 @@ TransactionController TransactionApi::FundRawTransaction(
       throw CfdException(CfdError::kCfdIllegalArgumentError, "low BTC.");
     }
   }
-  info(CFD_LOG_SOURCE, "3. utxo_amount=[{}]", utxo_amount.GetSatoshiValue());
 
+  std::vector<uint8_t> txid_bytes(cfd::core::kByteData256Length);
   Amount diff_amount = utxo_amount;
   diff_amount -= tx_amount;
-  info(CFD_LOG_SOURCE, "4. diff_amount=[{}]", diff_amount.GetSatoshiValue());
   int64_t diff_satoshi = diff_amount.GetSatoshiValue();
   Address address = addr_factory.GetAddress(reserve_txout_address);
   Amount dust_amount = option.GetDustFeeAmount(address);
@@ -369,7 +384,7 @@ TransactionController TransactionApi::FundRawTransaction(
       // 必要額以上ある場合、TxOutが増えるのでfee再計算
       // dummyのtx作成
       TransactionController txc_dummy(tx_hex);
-      std::vector<UtxoData> new_selected_utxos = selected_txin_utxos;
+      std::vector<UtxoData> new_selected_utxos = matched_txin_utxos;
       Txid txid;
       for (const Utxo& coin : selected_coins) {
         memcpy(txid_bytes.data(), coin.txid, txid_bytes.size());
