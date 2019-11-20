@@ -333,6 +333,44 @@ TransactionController TransactionApi::FundRawTransaction(
     info(CFD_LOG_SOURCE, "fee={}", fee.GetSatoshiValue());
   }
 
+#if 1
+  Amount diff_amount = Amount();
+  Amount select_require_amount;
+  Amount new_txout_amount = target_value;
+  if (fee > 0) {
+    // fee考慮
+    if (txin_amount > (tx_amount + fee)) {
+      diff_amount = txin_amount - tx_amount;
+      new_txout_amount += diff_amount;
+      // txinの余剰分でtarget分が満たされない場合
+      if (diff_amount < target_value) {
+        select_require_amount = target_value - diff_amount;
+      }
+    }
+    else if (txin_amount < (tx_amount + fee)) {
+      diff_amount = tx_amount - txin_amount;
+      new_txout_amount += diff_amount;
+      select_require_amount = diff_amount;
+    } else {
+      select_require_amount = fee;
+    }
+  } else {
+    // fee考慮なし
+    if (txin_amount > tx_amount) {
+      diff_amount = txin_amount - tx_amount;
+      new_txout_amount += diff_amount;
+      // txinの余剰分でtarget分が満たされない場合
+      if (diff_amount < target_value) {
+        select_require_amount = target_value - diff_amount;
+      }
+    }
+    else if (txin_amount < tx_amount) {
+      diff_amount = tx_amount - txin_amount;
+      new_txout_amount += diff_amount;
+      select_require_amount = diff_amount;
+    }
+  }
+#else
   // 探索対象額を設定。未設定時はTxOutの合計額を設定。
   Amount target_amount = target_value;
   if (target_amount.GetSatoshiValue() == 0) {
@@ -349,6 +387,7 @@ TransactionController TransactionApi::FundRawTransaction(
     // txout設定額よりも大きな額を収集要求した
     dest_amount = target_value;
   }
+#endif
 
   // execute coinselection
   CoinApi coin_api;
