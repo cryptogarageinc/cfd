@@ -286,8 +286,7 @@ TransactionController TransactionApi::FundRawTransaction(
   if (prefix_list) {
     addr_factory = AddressFactory(net_type, *prefix_list);
   }
-  Address reserve_address = 
-      addr_factory.GetAddress(reserve_txout_address);
+  Address reserve_address = addr_factory.GetAddress(reserve_txout_address);
   // FIXME(fujita-cg): AddressFactory::GetAddress()でチェックをしたいが、
   //   影響範囲が大きいためAPIでチェックを実行
   if (!addr_factory.CheckAddressNetType(reserve_address, net_type)) {
@@ -298,7 +297,7 @@ TransactionController TransactionApi::FundRawTransaction(
         ": input_net_type=[{}], parsed_net_type=[{}]",
         net_type, reserve_address.GetNetType());
     throw CfdException(
-        CfdError::kCfdIllegalArgumentError, 
+        CfdError::kCfdIllegalArgumentError,
         "Failed to FundRawTransaction. "
         "Input address and network is unmatch.");
   }
@@ -346,8 +345,7 @@ TransactionController TransactionApi::FundRawTransaction(
       if (diff_amount < target_value) {
         select_require_amount = target_value - diff_amount;
       }
-    }
-    else if (txin_amount < (tx_amount + fee)) {
+    } else if (txin_amount < (tx_amount + fee)) {
       diff_amount = tx_amount - txin_amount;
       new_txout_amount += diff_amount;
       select_require_amount = diff_amount;
@@ -363,8 +361,7 @@ TransactionController TransactionApi::FundRawTransaction(
       if (diff_amount < target_value) {
         select_require_amount = target_value - diff_amount;
       }
-    }
-    else if (txin_amount < tx_amount) {
+    } else if (txin_amount < tx_amount) {
       diff_amount = tx_amount - txin_amount;
       new_txout_amount += diff_amount;
       select_require_amount = diff_amount;
