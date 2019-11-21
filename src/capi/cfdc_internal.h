@@ -58,7 +58,8 @@ CFDC_API int SetLastFatalError(void* handle, const char* message);
  * @param[in] exception  CFD例外オブジェクト
  * @return second parameter object.
  */
-CFDC_API const CfdException& SetLastError(void* handle, const CfdException& exception);
+CFDC_API const CfdException& SetLastError(
+    void* handle, const CfdException& exception);
 
 /**
  * @brief 例外エラー情報を設定する。
