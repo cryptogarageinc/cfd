@@ -745,7 +745,7 @@ ConfidentialTransactionController ElementsTransactionApi::FundRawTransaction(
 
   // 探索対象assetを設定。未設定時はTxOutの合計額を設定。
   // asset毎にcoin selection額を設定
-  // ** fee assetは、誤差を少なくするためfee以外のtxoutが追加されてから計算する。 **
+  // ** fee assetは誤差を少なくする為fee以外のtxoutを追加してから計算する **
   std::map<std::string, Amount> target_values = map_target_value;
   std::map<std::string, Amount> select_require_values;
   Amount fee_asset_target_value;
