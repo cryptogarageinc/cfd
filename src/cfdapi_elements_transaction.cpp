@@ -698,7 +698,6 @@ ConfidentialTransactionController ElementsTransactionApi::FundRawTransaction(
       if ((txin.GetTxid().Equals(elements_utxo.utxo.txid)) &&
           (elements_utxo.utxo.vout == txin.GetVout())) {
         std::string asset = elements_utxo.utxo.asset.GetHex();
-            elements_utxo.utxo.txid.GetHex(), elements_utxo.utxo.vout, asset);
         if (std::find(asset_list.begin(), asset_list.end(), asset) ==
             asset_list.end()) {
           asset_list.push_back(asset);
