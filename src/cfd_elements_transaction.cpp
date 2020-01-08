@@ -180,7 +180,7 @@ ConfidentialTransactionController::AddPegoutTxOut(
     NetType elements_net_type, Address* btc_derive_address) {
   Script script;
   PegoutKeyData key_data;
-  if (online_pubkey.IsValid() && !master_online_key.IsInvalid()) {
+  if (online_pubkey.IsValid() && master_online_key.IsValid()) {
     // generate pubkey and whitelistproof
     Address derive_addr;
     key_data = ConfidentialTransaction::GetPegoutPubkeyData(

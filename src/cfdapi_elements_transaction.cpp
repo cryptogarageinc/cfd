@@ -439,7 +439,7 @@ ElementsTransactionApi::CreateRawPegoutTransaction(
       CreateRawTransaction(version, locktime, txins, txouts, empty_fee);
 
   if (pegout_data.online_pubkey.IsValid() &&
-      !pegout_data.master_online_key.IsInvalid()) {
+      pegout_data.master_online_key.IsValid()) {
     Address dummy_addr;
     ctxc.AddPegoutTxOut(
         pegout_data.amount, pegout_data.asset, pegout_data.genesisblock_hash,
