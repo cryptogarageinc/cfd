@@ -235,7 +235,7 @@ Amount TransactionApi::EstimateFee(
     }
 
     Script redeem_script;
-    if (utxo.redeem_script.IsEmpty() && !data.redeem_script.IsEmpty()) {
+    if (utxo.redeem_script.Empty() && !data.redeem_script.Empty()) {
       redeem_script = data.redeem_script;
     } else {
       redeem_script = utxo.redeem_script;

@@ -267,7 +267,7 @@ void TransactionController::InsertUnlockingScript(
     const std::vector<ByteData>& unlocking_scripts) {
   uint32_t txin_index = transaction_.GetTxInIndex(txid, vout);
   Script script = transaction_.GetTxIn(txin_index).GetUnlockingScript();
-  if (script.IsEmpty()) {
+  if (script.Empty()) {
     transaction_.SetUnlockingScript(txin_index, unlocking_scripts);
   } else {
     ScriptBuilder builder;

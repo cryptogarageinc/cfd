@@ -485,7 +485,7 @@ Amount ElementsTransactionApi::EstimateFee(
     bool is_blind, uint64_t effective_fee_rate) const {
   ConfidentialTransactionController txc(tx_hex);
 
-  if (fee_asset.IsEmpty()) {
+  if (fee_asset.Empty()) {
     warn(CFD_LOG_SOURCE, "Failed to EstimateFee. Empty fee asset.");
     throw CfdException(CfdError::kCfdIllegalArgumentError, "Empty fee asset.");
   }
@@ -494,7 +494,7 @@ Amount ElementsTransactionApi::EstimateFee(
   bool exist_fee = false;
   const ConfidentialTransaction& ctx = txc.GetTransaction();
   for (const auto& txout : ctx.GetTxOutList()) {
-    if (txout.GetLockingScript().IsEmpty()) {
+    if (txout.GetLockingScript().Empty()) {
       if (txout.GetAsset().GetHex() != fee_asset.GetHex()) {
         warn(CFD_LOG_SOURCE, "Failed to EstimateFee. Unmatch fee asset.");
         throw CfdException(
@@ -542,7 +542,7 @@ Amount ElementsTransactionApi::EstimateFee(
     }
 
     Script redeem_script;
-    if (utxo.utxo.redeem_script.IsEmpty() && !data.redeem_script.IsEmpty()) {
+    if (utxo.utxo.redeem_script.Empty() && !data.redeem_script.Empty()) {
       redeem_script = data.redeem_script;
     } else {
       redeem_script = utxo.utxo.redeem_script;
@@ -612,7 +612,7 @@ ConfidentialTransactionController ElementsTransactionApi::FundRawTransaction(
   std::vector<ConfidentialTxOutReference> txout_list = ctx.GetTxOutList();
   for (size_t index = 0; index < txout_list.size(); ++index) {
     auto& txout = txout_list[index];
-    if (txout.GetLockingScript().IsEmpty()) {
+    if (txout.GetLockingScript().Empty()) {
       // feeは収集対象から除外
       fee_index = static_cast<int32_t>(index);
     } else {
@@ -662,7 +662,7 @@ ConfidentialTransactionController ElementsTransactionApi::FundRawTransaction(
   Amount fee;
   bool use_fee = false;
   if (option.GetEffectiveFeeBaserate() > 0) {
-    if (fee_asset.IsEmpty()) {
+    if (fee_asset.Empty()) {
       warn(CFD_LOG_SOURCE, "Failed to FundRawTransaction. Empty fee asset.");
       throw CfdException(
           CfdError::kCfdIllegalArgumentError, "Empty fee asset.");

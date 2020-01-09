@@ -214,7 +214,7 @@ const ConfidentialTxOutReference
 ConfidentialTransactionController::UpdateTxOutFeeAmount(
     uint32_t index, const Amount& value, const ConfidentialAssetId& asset) {
   ConfidentialTxOutReference ref = transaction_.GetTxOut(index);
-  if (!ref.GetLockingScript().IsEmpty()) {
+  if (!ref.GetLockingScript().Empty()) {
     throw CfdException(
         CfdError::kCfdIllegalArgumentError, "target is not fee txout.");
   }
@@ -236,7 +236,7 @@ void ConfidentialTransactionController::InsertUnlockingScript(
     const std::vector<ByteData>& unlocking_scripts) {
   uint32_t txin_index = transaction_.GetTxInIndex(txid, vout);
   Script script = transaction_.GetTxIn(txin_index).GetUnlockingScript();
-  if (script.IsEmpty()) {
+  if (script.Empty()) {
     transaction_.SetUnlockingScript(txin_index, unlocking_scripts);
   } else {
     ScriptBuilder builder;

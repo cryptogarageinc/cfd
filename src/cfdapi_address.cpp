@@ -56,7 +56,7 @@ Address AddressApi::CreateAddress(
           CfdError::kCfdIllegalArgumentError, "pubkey hex is empty.");
     }
   }
-  if ((script == nullptr) || (script->IsEmpty())) {
+  if ((script == nullptr) || (script->Empty())) {
     if (address_type == AddressType::kP2shAddress ||
         address_type == AddressType::kP2wshAddress ||
         address_type == AddressType::kP2shP2wshAddress) {

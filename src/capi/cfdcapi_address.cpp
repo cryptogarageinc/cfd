@@ -175,12 +175,12 @@ int CfdCreateAddress(
 
     work_address = CreateString(addr.GetAddress());
     if (locking_script != nullptr) {
-      if (!lock_script.IsEmpty()) {
+      if (!lock_script.Empty()) {
         work_locking_script = CreateString(lock_script.GetHex());
       }
     }
     if (p2sh_segwit_locking_script != nullptr) {
-      if (!unlocking_script.IsEmpty()) {
+      if (!unlocking_script.Empty()) {
         work_p2sh_segwit_locking_script =
             CreateString(unlocking_script.GetHex());
       }
@@ -347,12 +347,12 @@ int CfdFinalizeMultisigScript(
 
     work_address = CreateString(addr.GetAddress());
     if (redeem_script != nullptr) {
-      if (!redeem_script_obj.IsEmpty()) {
+      if (!redeem_script_obj.Empty()) {
         work_redeem_script = CreateString(redeem_script_obj.GetHex());
       }
     }
     if (witness_script != nullptr) {
-      if (!witness_script_obj.IsEmpty()) {
+      if (!witness_script_obj.Empty()) {
         work_witness_script = CreateString(witness_script_obj.GetHex());
       }
     }
@@ -504,7 +504,7 @@ int CfdGetDescriptorData(
     if (max_index != nullptr) *max_index = last_index;
     if (depth != nullptr) *depth = desc_data.depth;
     if (script_type != nullptr) *script_type = desc_data.type;
-    if ((locking_script != nullptr) && (!desc_data.locking_script.IsEmpty())) {
+    if ((locking_script != nullptr) && (!desc_data.locking_script.Empty())) {
       work_locking_script = CreateString(desc_data.locking_script.GetHex());
     }
     if ((address != nullptr) &&
@@ -516,7 +516,7 @@ int CfdGetDescriptorData(
     if (hash_type != nullptr) {
       *hash_type = desc_data.address_type;
     }
-    if ((redeem_script != nullptr) && (!desc_data.redeem_script.IsEmpty())) {
+    if ((redeem_script != nullptr) && (!desc_data.redeem_script.Empty())) {
       work_redeem_script = CreateString(desc_data.redeem_script.GetHex());
     }
     if (key_type != nullptr) {

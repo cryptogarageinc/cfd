@@ -116,7 +116,7 @@ static void ValidateAddMultisigSign(  // linefeed
   // check require script
   switch (address_type) {
     case AddressType::kP2shAddress: {
-      if (redeem_script.IsEmpty()) {
+      if (redeem_script.Empty()) {
         warn(
             CFD_LOG_SOURCE,
             "Failed to AddSegwitMultisigSign. redeem script empty.");
@@ -127,7 +127,7 @@ static void ValidateAddMultisigSign(  // linefeed
       break;
     }
     case AddressType::kP2wshAddress: {
-      if (witness_script.IsEmpty()) {
+      if (witness_script.Empty()) {
         warn(
             CFD_LOG_SOURCE,
             "Failed to AddSegwitMultisigSign. witness script empty.");
@@ -138,7 +138,7 @@ static void ValidateAddMultisigSign(  // linefeed
       break;
     }
     case AddressType::kP2shP2wshAddress: {
-      if (redeem_script.IsEmpty()) {
+      if (redeem_script.Empty()) {
         warn(
             CFD_LOG_SOURCE,
             "Failed to AddSegwitMultisigSign. redeem script empty.");
@@ -146,7 +146,7 @@ static void ValidateAddMultisigSign(  // linefeed
             CfdError::kCfdIllegalArgumentError,
             "Invalid hex string. empty redeemScript.");
       }
-      if (witness_script.IsEmpty()) {
+      if (witness_script.Empty()) {
         warn(
             CFD_LOG_SOURCE,
             "Failed to AddSegwitMultisigSign. witness script empty.");
