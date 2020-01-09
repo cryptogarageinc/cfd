@@ -60,13 +60,14 @@ enum SignDataType {
  * @typedef SignVerifyType
  * @brief Sign verify type.
  */
-enum SignVerifyType {
-  kNotVerify = 0,
-  kVerifyUnknown,
-  kVerifySighashAll,
-  kVerifySighashSingle,
-  kVerifySighashNone,
-};
+// FIXME: delete
+// enum SignVerifyType {
+//   kNotVerify = 0,
+//   kVerifyUnknown,
+//   kVerifySighashAll,
+//   kVerifySighashSingle,
+//   kVerifySighashNone,
+// };
 
 /**
  * @brief UTXO構造体

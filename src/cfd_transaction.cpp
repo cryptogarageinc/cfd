@@ -15,6 +15,7 @@
 #include "cfdcore/cfdcore_address.h"
 #include "cfdcore/cfdcore_amount.h"
 #include "cfdcore/cfdcore_coin.h"
+#include "cfdcore/cfdcore_descriptor.h"
 #include "cfdcore/cfdcore_exception.h"
 #include "cfdcore/cfdcore_key.h"
 #include "cfdcore/cfdcore_logger.h"
@@ -33,6 +34,10 @@ using cfd::core::ByteData;
 using cfd::core::ByteData256;
 using cfd::core::CfdError;
 using cfd::core::CfdException;
+using cfd::core::Descriptor;
+using cfd::core::DescriptorKeyReference;
+using cfd::core::DescriptorScriptType;
+using cfd::core::DescriptorScriptReference;
 using cfd::core::HashType;
 using cfd::core::NetType;
 using cfd::core::Pubkey;
@@ -177,13 +182,108 @@ void TransactionContext::Verify() {
 }
 
 void TransactionContext::Verify(const OutPoint& outpoint) {
-  GetTxInIndex(outpoint.GetTxid(), outpoint.GetVout());
-
-  if (utxo_map_.count(outpoint) == 0) {
-    // FIXME throw utxo not found.
+  // GetTxInIndex(outpoint.GetTxid(), outpoint.GetVout());
+  // skip if outpoint is ignore target
+  if (verify_ignore_map_.count(outpoint) == 0) {
+    return;
   }
 
-  // FIXME please implements.
+  if (utxo_map_.count(outpoint) == 0) {
+    warn(
+      CFD_LOG_SOURCE,
+      "Failed to verify signature. Not found utxo in context.: "
+      "outpoint=[txid:{}, vout:{}]",
+      outpoint.GetTxid().GetHex(), outpoint.GetVout());
+    throw CfdException(
+      CfdError::kCfdIllegalStateError,
+      "Failed to verify signature. Not found utxo in context.");
+  }
+  UtxoData utxo = utxo_map_.at(outpoint);
+
+  // parse output descriptor and set pubkeys
+  std::vector<Pubkey> pubkeys;
+  Script redeem_script;
+  bool use_witness = false;
+  // Descriptor desc = Descriptor::Parse(utxo.descriptor);
+  // std::vector<DescriptorScriptReference> script_refs = desc.GetReferenceAll();
+  // DescriptorScriptType type = script_refs.at(0).GetScriptType();
+  // switch (type) {
+  //   case DescriptorScriptType::kDescriptorScriptPk:
+  //   case DescriptorScriptType::kDescriptorScriptPkh:
+  //   case DescriptorScriptType::kDescriptorScriptWpkh:
+  //     break;
+  //   case DescriptorScriptType::kDescriptorScriptSh:
+  //   case DescriptorScriptType::kDescriptorScriptWsh:
+  //     break;
+  //   default:
+  //     break;
+  // }
+
+  // TODO: parse pubkey and script from descriptor
+
+  // create sighash
+  if (signed_map_.count(outpoint) == 0) {
+    warn(
+      CFD_LOG_SOURCE,
+      "Failed to verify signature. Not found sighash type in context.: "
+      "outpoint=[txid:{}, vout:{}]",
+      outpoint.GetTxid().GetHex(), outpoint.GetVout());
+    throw CfdException(
+      CfdError::kCfdIllegalStateError,
+      "Failed to verify signature. Not found sighash type in context.");
+  }
+  SigHashType hash_type = signed_map_.at(outpoint);
+  // create sig and verify function
+  auto verify_signature = [&hash_type, this](
+      const UtxoData& utxo, const ByteData& signature, const Pubkey* pubkey,
+      const Script* script) mutable -> bool {
+    // check used witness by utxo address type
+    WitnessVersion wit_ver = WitnessVersion::kVersionNone;  // initial value
+    switch (utxo.address_type) {
+      case AddressType::kP2wpkhAddress:
+      case AddressType::kP2wshAddress:
+      case AddressType::kP2shP2wpkhAddress:
+      case AddressType::kP2shP2wshAddress:
+        wit_ver = WitnessVersion::kVersion0;
+        break;
+      default:
+        // fall through
+        break;
+    }
+    ByteData sighash;
+    if (script != nullptr || !script->IsEmpty()) {
+      sighash = this->CreateSignatureHash(
+          utxo.txid, utxo.vout, *script, hash_type, utxo.amount, wit_ver);
+    } else if (pubkey != nullptr || !pubkey->IsValid()) {
+      sighash = this->CreateSignatureHash(
+          utxo.txid, utxo.vout, *pubkey, hash_type, utxo.amount, wit_ver);
+    } else {
+      return false;
+    }
+    return this->VerifyInputSignature(signature, *pubkey, utxo.txid, utxo.vout,
+        hash_type, utxo.amount, wit_ver);
+  };
+
+  ByteData signature;
+  // TODO: extract signature from TxIn
+  // TODO: Remote HASHTYPE byte and der decoding
+
+  // TODO: check signatures recursively
+  bool result = false;
+  for (auto pubkey : pubkeys) {
+    result |= verify_signature(utxo, signature, &pubkey, &redeem_script);
+  }
+
+  if (!result) {
+    warn(
+      CFD_LOG_SOURCE,
+      "Failed to verify signature. Not found sighash type in context.: "
+      "outpoint=[txid:{}, vout:{}]",
+      outpoint.GetTxid().GetHex(), outpoint.GetVout());
+    throw CfdException(
+      CfdError::kCfdIllegalStateError,
+      "Failed to verify signature. Not found sighash type in context.");
+  }
 
   verify_map_.emplace(outpoint);
   verify_ignore_map_.erase(outpoint);
