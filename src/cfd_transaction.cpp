@@ -248,7 +248,7 @@ void TransactionContext::SignWithPrivkeySimple(
     warn(CFD_LOG_SOURCE, "Failed to SignWithPrivkeySimple. Invalid pubkey.");
     throw CfdException(CfdError::kCfdIllegalArgumentError, "Invalid pubkey.");
   }
-  if (privkey.IsInvalid()) {
+  if (!privkey.IsValid()) {
     warn(CFD_LOG_SOURCE, "Failed to SignWithPrivkeySimple. Invalid privkey.");
     throw CfdException(CfdError::kCfdIllegalArgumentError, "Invalid privkey.");
   }
@@ -332,7 +332,7 @@ void TransactionContext::AddPubkeyHashSign(
     AddSign(outpoint, sign_params, true, true);
   }
   if (has_scriptsig) {
-    if (!locking_script.IsEmpty()) {  // p2sh-p2wpkh
+    if (!locking_script.Empty()) {  // p2sh-p2wpkh
       std::vector<SignParameter> scriptsig;
       scriptsig.push_back(SignParameter(locking_script));
       AddSign(outpoint, scriptsig, false, true);
@@ -348,7 +348,7 @@ void TransactionContext::AddScriptHashSign(
     const OutPoint& outpoint, const std::vector<SignParameter>& signatures,
     const Script& redeem_script, AddressType address_type,
     bool is_multisig_script) {
-  if (redeem_script.IsEmpty()) {
+  if (redeem_script.Empty()) {
     warn(CFD_LOG_SOURCE, "Failed to AddScriptHashSign. Empty script.");
     throw CfdException(CfdError::kCfdIllegalArgumentError, "Empty script.");
   }
@@ -413,7 +413,7 @@ void TransactionContext::AddScriptHashSign(
     AddSign(outpoint, sign_params, true, true);
   }
   if (has_scriptsig) {
-    if (!locking_script.IsEmpty()) {  // p2sh-p2wpkh
+    if (!locking_script.Empty()) {  // p2sh-p2wpkh
       std::vector<SignParameter> scriptsig;
       scriptsig.push_back(SignParameter(locking_script));
       AddSign(outpoint, scriptsig, false, true);
