@@ -305,7 +305,7 @@ std::vector<Utxo> CoinSelection::SelectCoins(
     const Amount& tx_fee_value, AmountMap* map_select_value,
     Amount* utxo_fee_value, std::map<std::string, bool>* map_searched_bnb) {
   bool calculate_fee = (option_params.GetEffectiveFeeBaserate() != 0);
-  if (calculate_fee && option_params.GetFeeAsset().IsEmpty()) {
+  if (calculate_fee && option_params.GetFeeAsset().Empty()) {
     warn(
         CFD_LOG_SOURCE,
         "Failed to SelectCoins. Fee calculation option error."
@@ -340,7 +340,7 @@ std::vector<Utxo> CoinSelection::SelectCoins(
   for (auto& target : work_target_values) {
     // asset valid check...
     ConfidentialAssetId target_asset(target.first);
-    if (target_asset.IsEmpty()) {
+    if (target_asset.Empty()) {
       warn(CFD_LOG_SOURCE, "Failed to SelectCoins. Target asset is empty.");
       throw CfdException(
           CfdError::kCfdIllegalStateError,

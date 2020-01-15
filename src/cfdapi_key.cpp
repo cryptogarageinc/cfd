@@ -56,7 +56,7 @@ std::string KeyApi::GetPubkeyFromPrivkey(
       throw except1;
     }
   }
-  if (key.IsInvalid()) {
+  if (!key.IsValid()) {
     try {
       key = Privkey::FromWif(privkey, NetType::kTestnet, is_compressed);
     } catch (const CfdException& except2) {
@@ -66,7 +66,7 @@ std::string KeyApi::GetPubkeyFromPrivkey(
       }
     }
   }
-  if (key.IsInvalid()) {
+  if (!key.IsValid()) {
     key = Privkey(ByteData(privkey));
   }
   return key.GeneratePubkey(is_compressed).GetHex();

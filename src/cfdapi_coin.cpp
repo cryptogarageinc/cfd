@@ -58,7 +58,7 @@ void CoinApi::ConvertToUtxo(const UtxoData& utxo_data, Utxo* utxo) const {
           utxo_data.address.GetLockingScript().GetData().GetBytes();
       utxo->address_type =
           static_cast<uint16_t>(utxo_data.address.GetAddressType());
-    } else if (!utxo_data.locking_script.IsEmpty()) {
+    } else if (!utxo_data.locking_script.Empty()) {
       locking_script_bytes = utxo_data.locking_script.GetData().GetBytes();
       if (utxo_data.locking_script.IsP2wpkhScript()) {
         utxo->address_type = AddressType::kP2wpkhAddress;
@@ -103,7 +103,7 @@ void CoinApi::ConvertToUtxo(const UtxoData& utxo_data, Utxo* utxo) const {
     }
 
 #ifndef CFD_DISABLE_ELEMENTS
-    if (!utxo_data.asset.IsEmpty()) {
+    if (!utxo_data.asset.Empty()) {
       std::vector<uint8_t> asset = utxo_data.asset.GetData().GetBytes();
       memcpy(utxo->asset, asset.data(), sizeof(utxo->asset));
       // utxo->blinded = false;

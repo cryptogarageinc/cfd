@@ -1446,7 +1446,7 @@ int CfdUnblindTxOut(
     UnblindParameter unblind_data =
         ctxc.UnblindTxOut(tx_out_index, Privkey(blinding_key));
 
-    if (!unblind_data.asset.IsEmpty()) {
+    if (!unblind_data.asset.Empty()) {
       if (asset != nullptr) {
         work_asset = CreateString(unblind_data.asset.GetHex());
       }
@@ -1525,7 +1525,7 @@ int CfdUnblindIssuance(
       unblind_token = unblind_datas[1];
     }
 
-    if (!unblind_asset.asset.IsEmpty()) {
+    if (!unblind_asset.asset.Empty()) {
       if (asset != nullptr) {
         work_asset = CreateString(unblind_asset.asset.GetHex());
       }
@@ -1540,7 +1540,7 @@ int CfdUnblindIssuance(
             CreateString(unblind_asset.vbf.GetHex());
       }
     }
-    if (!unblind_token.asset.IsEmpty()) {
+    if (!unblind_token.asset.Empty()) {
       if (token != nullptr) {
         work_token = CreateString(unblind_token.asset.GetHex());
       }

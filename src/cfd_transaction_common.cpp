@@ -97,7 +97,7 @@ void UtxoUtil::ConvertToUtxo(
       std::vector<AddressFormatData> addr_prefixes =
           cfd::core::GetBitcoinAddressFormatList();
 #ifndef CFD_DISABLE_ELEMENTS
-      if (!utxo_data.asset.IsEmpty()) {
+      if (!utxo_data.asset.Empty()) {
         std::vector<AddressFormatData> elements_prefixes =
             cfd::core::GetElementsAddressFormatList();
         addr_prefixes = elements_prefixes;
@@ -135,7 +135,7 @@ void UtxoUtil::ConvertToUtxo(
         output.address_type = addr_type;
       }
       utxo->address_type = static_cast<uint16_t>(output.address_type);
-    } else if (!utxo_data.locking_script.IsEmpty()) {
+    } else if (!utxo_data.locking_script.Empty()) {
       locking_script_bytes = utxo_data.locking_script.GetData().GetBytes();
       if (utxo_data.locking_script.IsP2wpkhScript()) {
         utxo->address_type = AddressType::kP2wpkhAddress;
@@ -181,7 +181,7 @@ void UtxoUtil::ConvertToUtxo(
     }
 
 #ifndef CFD_DISABLE_ELEMENTS
-    if (!utxo_data.asset.IsEmpty()) {
+    if (!utxo_data.asset.Empty()) {
       std::vector<uint8_t> asset = utxo_data.asset.GetData().GetBytes();
       memcpy(utxo->asset, asset.data(), sizeof(utxo->asset));
       // utxo->blinded = false;
