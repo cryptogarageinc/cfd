@@ -1124,14 +1124,12 @@ const generateStructHeader = (dirname, filename, json_list) => {
 // ----------------------------------------------------------------------------
 function convertFile() {
   const fileList = [];
-  let cfdBaseDir;
-  const cfdPath = `${__dirname}/../external/cfd/`;
-  const cfdPath2 = `${__dirname}/../../cfd/`;
-  let folderPath = `src/jsonapi/input_json_format/`;
-  const outJsonSourceFolderPath = `${__dirname}/../../cfd/src/jsonapi/autogen/`;
-  const outJsonHeaderFolderPath = `${__dirname}/../../cfd/src/jsonapi/autogen/`;
-  let outStructDirPath = `src/jsonapi/`;
-  let outTsFolderPath = ``;
+  const cfdPath = `${__dirname}/..`;
+  const folderPath = `${cfdPath}/src/jsonapi/input_json_format/`;
+  const outJsonSourceFolderPath = `${__dirname}/../src/jsonapi/autogen/`;
+  const outJsonHeaderFolderPath = `${__dirname}/../src/jsonapi/autogen/`;
+  const outStructDirPath = `${cfdPath}/src/jsonapi/`;
+  const outTsFolderPath = `${__dirname}/`;  // relative path from tsconfig.json
   const outStructFileName = `cfd_struct.h`;
   // const outTsFileName = `index.d.ts`;
   let classHeaderList = [];
@@ -1140,18 +1138,6 @@ function convertFile() {
   let jsonClassMap = {};
   let jsonTypeList = [];
   let functionList = [];
-
-  if (fs.existsSync(cfdPath) && fs.statSync(cfdPath).isDirectory()) {
-    cfdBaseDir = cfdPath;
-    outTsFolderPath = cfdPath + outTsFolderPath;
-    folderPath = cfdPath + folderPath;
-    outStructDirPath = cfdPath + outStructDirPath;
-  } else {
-    cfdBaseDir = cfdPath2;
-    outTsFolderPath = `${__dirname}/`;  // relative path from tsconfig.json
-    folderPath = cfdPath2 + folderPath;
-    outStructDirPath = cfdPath2 + outStructDirPath;
-  }
 
   let jsonObjectCommon = undefined;
   fs.readdir(folderPath, (err, files) => {
@@ -1228,7 +1214,7 @@ function convertFile() {
 
     if (jsonDataList.length > 0) {
       const header_str = generateStructHeader(outStructDirPath, outStructFileName, jsonDataList);
-      fs.writeFileSync(`${outStructDirPath}${outStructFileName}`, header_str);
+      fs.writeFileSync(path.resolve(`${outStructDirPath}${outStructFileName}`), headerStr);
       console.log(`output: ${outStructFileName}`);
     }
   });
