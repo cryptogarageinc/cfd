@@ -273,7 +273,7 @@ Amount TransactionApi::EstimateFee(
   uint32_t utxo_vsize =
       AbstractTransaction::GetVsizeFromSize(size, witness_size);
 
-  uint64_t fee_rate = static_cast<uint64_t>(floor(effective_fee_rate * 1000));
+  uint64_t fee_rate = static_cast<uint64_t>(ceil(effective_fee_rate * 1000.0));
   FeeCalculator fee_calc(fee_rate);
   Amount tx_fee_amount = fee_calc.GetFee(tx_vsize);
   Amount utxo_fee_amount = fee_calc.GetFee(utxo_vsize);

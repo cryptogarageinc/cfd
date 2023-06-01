@@ -149,13 +149,13 @@ void CoinSelectionOption::SetChangeSpendSize(size_t size) {
 
 void CoinSelectionOption::SetEffectiveFeeBaserate(double baserate) {
   if (baserate >= 0) {
-    effective_fee_baserate_ = static_cast<uint64_t>(floor(baserate * 1000));
+    effective_fee_baserate_ = static_cast<uint64_t>(ceil(baserate * 1000.0));
   }
 }
 
 void CoinSelectionOption::SetLongTermFeeBaserate(double baserate) {
   if (baserate >= 0) {
-    long_term_fee_baserate_ = static_cast<uint64_t>(floor(baserate * 1000));
+    long_term_fee_baserate_ = static_cast<uint64_t>(ceil(baserate * 1000.0));
   }
 }
 
@@ -165,7 +165,7 @@ void CoinSelectionOption::SetKnapsackMinimumChange(int64_t min_change) {
 
 void CoinSelectionOption::SetDustFeeRate(double baserate) {
   if (baserate >= 0) {
-    dust_fee_rate_ = static_cast<uint64_t>(floor(baserate * 1000));
+    dust_fee_rate_ = static_cast<uint64_t>(ceil(baserate * 1000.0));
   }
 }
 

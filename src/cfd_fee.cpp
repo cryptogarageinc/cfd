@@ -25,7 +25,7 @@ using cfd::core::TxIn;
 // ファイル内定数
 // -----------------------------------------------------------------------------
 //! KB size
-static constexpr const uint64_t kKiloByteSize = 1000;
+static constexpr const int64_t kKiloByteSize = 1000;
 
 // -----------------------------------------------------------------------------
 // FeeCalculator
@@ -34,7 +34,9 @@ Amount FeeCalculator::CalculateFee(  // Fee計算
     uint32_t size, uint32_t vsize, uint64_t rate) {
   int64_t satoshi;
   uint32_t use_size = ((vsize != 0) && (size != vsize)) ? vsize : size;
-  satoshi = use_size * rate / kKiloByteSize;
+  int64_t temp_rate_size = use_size * rate;
+  satoshi = temp_rate_size / kKiloByteSize;
+  if ((temp_rate_size % kKiloByteSize) != 0) ++satoshi;
   if (satoshi < kRelayMinimumFee) {
     satoshi = kRelayMinimumFee;
   }

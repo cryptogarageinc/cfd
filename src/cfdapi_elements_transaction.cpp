@@ -531,7 +531,7 @@ Amount ElementsTransactionApi::EstimateFee(
     const ConfidentialAssetId& fee_asset, Amount* txout_fee, Amount* utxo_fee,
     bool is_blind, double effective_fee_rate, int exponent, int minimum_bits,
     uint32_t* append_asset_count) const {
-  uint64_t fee_rate = static_cast<uint64_t>(floor(effective_fee_rate * 1000));
+  uint64_t fee_rate = static_cast<uint64_t>(ceil(effective_fee_rate * 1000.0));
   return EstimateFee(
       tx_hex, utxos, fee_asset, txout_fee, utxo_fee, is_blind, fee_rate,
       exponent, minimum_bits, append_asset_count);
